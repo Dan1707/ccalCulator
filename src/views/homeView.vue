@@ -7,6 +7,7 @@ import { Calculator } from 'lucide-vue-next'
 import { ref } from 'vue'
 
 import type { Database } from '../../database.types'
+import CcalCard from '@/components/ccalCard.vue'
 
 type Product = Database['public']['Tables']['products']['Row']
 type SelectedProduct = Product & { amount: number }
@@ -33,7 +34,6 @@ const getCalories = async () => {
 			.select()
 			.ilike('name', `%${searchText}%`)
 
-		console.log(data)
 		searchResults.value = data || []
 
 		if (error) {
@@ -120,7 +120,7 @@ const getCurrentProduct = async (product: SelectedProduct) => {
 				<p
 					class="text-white p-3 cursor-pointer hover:bg-primary rounded-xl duration-300"
 					v-for="(item, index) in searchResults"
-					:key="index"
+					:key="item.id"
 					@click="
 						() => {
 							currentItem = item
@@ -140,34 +140,11 @@ const getCurrentProduct = async (product: SelectedProduct) => {
 			<h2 class="text-2xl font-bold mt-7">Today:</h2>
 
 			<div class="grid grid-cols-3 gap-4 mt-10">
-				<div v-for="product in products" :key="product.id">
-					<div
-						class="bg-card rounded-xl overflow-hidden shadow-xl mb-5 max-w-md"
-					>
-						<img
-							:src="product.image_url || ''"
-							alt="Product Image"
-							loading="lazy"
-							class="w-full h-60 object-cover mb-3"
-						/>
-						<div class="p-5">
-							<div class="flex justify-between items-center">
-								<h2 class="text-xl font-semibold text-white mb-3">
-									{{ product.name }}
-								</h2>
-								<p class="text-gray-300 mb-2 font-medium">
-									{{
-										product.kcal ? (product.kcal * product.amount) / 100 : null
-									}}
-									Kcal
-								</p>
-							</div>
-							<p class="text-gray-300 mb-2 font-medium">
-								{{ product.amount }}g
-							</p>
-						</div>
-					</div>
-				</div>
+				<CcalCard
+					v-for="product in products"
+					:key="product.id"
+					:product="product"
+				/>
 			</div>
 		</div>
 	</section>
