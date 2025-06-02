@@ -9,10 +9,14 @@ import { ref } from 'vue'
 import type { Database } from '../../database.types'
 
 type Product = Database['public']['Tables']['products']['Row']
+type SelectedProduct = Product & { amount: number }
 
 const dishName = ref('')
-const searchResults = ref<Product[]>([])
+const dishAmount = ref()
+const dishKcal = ref(0)
+const currentItem = ref<SelectedProduct | Product | null>()
 
+const searchResults = ref<Product[]>([])
 const showResults = ref(false)
 
 const getCalories = async () => {
@@ -40,9 +44,9 @@ const getCalories = async () => {
 	}
 }
 
-const products = ref<Product[]>([])
+const products = ref<SelectedProduct[]>([])
 
-const getCurrentProduct = async (product: Product) => {
+const getCurrentProduct = async (product: SelectedProduct) => {
 	showResults.value = false
 
 	try {
@@ -51,10 +55,17 @@ const getCurrentProduct = async (product: Product) => {
 			.select()
 			.eq('id', product.id)
 
-		console.log(data)
+		if (product.kcal && product.amount_g) {
+			dishKcal.value += parseFloat(
+				((product.kcal * dishAmount.value) / 100).toFixed(2)
+			)
+		}
 
 		if (data && data.length > 0) {
-			products.value.push(data[0])
+			products.value.push({
+				...data[0],
+				amount: dishAmount.value,
+			})
 		}
 
 		if (error) {
@@ -86,11 +97,16 @@ const getCurrentProduct = async (product: Product) => {
 						class="flex flex-col items-start text-sm font-semibold text-gray-300 w-full shrink-2"
 					>
 						Amount (g)
-						<Input placeholder="150" type="number" class="w-full" />
+						<Input
+							placeholder="150"
+							type="number"
+							class="w-full"
+							v-model="dishAmount"
+						/>
 					</Label>
 					<Button
 						class="bg-gradient-to-tr from-orange-500 to-orange-400 hover:from-orange-400 hover:to-orange-300 text-white text-lg font-bold rounded-xl px-8 py-3 shadow-lg transition hover:scale-105 mt-1"
-						@click.prevent="getCalories"
+						@click.prevent="getCurrentProduct(currentItem as SelectedProduct)"
 					>
 						<Calculator :size="48" />
 						Calculate
@@ -105,31 +121,51 @@ const getCurrentProduct = async (product: Product) => {
 					class="text-white p-3 cursor-pointer hover:bg-primary rounded-xl duration-300"
 					v-for="(item, index) in searchResults"
 					:key="index"
-					@click="getCurrentProduct(item)"
+					@click="
+						() => {
+							currentItem = item
+							dishName = item.name || ''
+							showResults = false
+						}
+					"
 				>
 					{{ item.name }}
 				</p>
 			</div>
 		</div>
 	</section>
-
-	<section>
+	{{ dishKcal }}
+	<section v-if="products.length !== 0">
 		<div class="container">
 			<h2 class="text-2xl font-bold mt-7">Today:</h2>
 
 			<div class="grid grid-cols-3 gap-4 mt-10">
 				<div v-for="product in products" :key="product.id">
-					<div class="bg-card rounded-xl p-5 shadow-lg mb-5">
+					<div
+						class="bg-card rounded-xl overflow-hidden shadow-xl mb-5 max-w-md"
+					>
 						<img
 							:src="product.image_url || ''"
 							alt="Product Image"
 							loading="lazy"
-							class="w-full h-60 object-cover rounded-lg mb-3"
+							class="w-full h-60 object-cover mb-3"
 						/>
-						<h2 class="text-xl font-semibold text-white mb-3">
-							{{ product.name }}
-						</h2>
-						<p class="text-gray-300 mb-2">Calories: {{ product.kcal }}</p>
+						<div class="p-5">
+							<div class="flex justify-between items-center">
+								<h2 class="text-xl font-semibold text-white mb-3">
+									{{ product.name }}
+								</h2>
+								<p class="text-gray-300 mb-2 font-medium">
+									{{
+										product.kcal ? (product.kcal * product.amount) / 100 : null
+									}}
+									Kcal
+								</p>
+							</div>
+							<p class="text-gray-300 mb-2 font-medium">
+								{{ product.amount }}g
+							</p>
+						</div>
 					</div>
 				</div>
 			</div>

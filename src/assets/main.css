@@ -17,13 +17,6 @@ a,
 	}
 }
 
-@media (min-width: 1024px) {
-	body {
-		display: flex;
-		place-items: center;
-	}
-}
-
 @theme inline {
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
@@ -144,7 +137,7 @@ a,
 }
 
 .container {
-	@apply w-full mx-auto px-4;
+	@apply w-full m-auto px-4;
 
 	@apply sm:max-w-screen-sm sm:px-6;
 	@apply md:max-w-screen-md;
