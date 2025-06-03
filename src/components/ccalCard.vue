@@ -15,7 +15,7 @@ defineProps<{
 			:src="product.image_url || ''"
 			alt="Product Image"
 			loading="lazy"
-			class="w-full h-60 object-cover mb-3"
+			class="w-full h-40 object-cover mb-3"
 		/>
 		<div class="p-5">
 			<div class="flex justify-between items-center">

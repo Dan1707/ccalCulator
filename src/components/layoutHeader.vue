@@ -3,7 +3,7 @@ import { User } from 'lucide-vue-next'
 </script>
 
 <template>
-	<header class="bg-card w-screen">
+	<header class="bg-card w-full">
 		<div class="container p-5 flex items-center justify-between">
 			<div class="flex items-center gap-4">
 				<img src="/src/assets/img/icon.svg" alt="logo" class="max-w-8" />
