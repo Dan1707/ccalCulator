@@ -1,27 +1,34 @@
-<script lang="ts" setup>
+<script setup lang="ts">
+import { ref } from 'vue'
 import {
 	Dialog,
+	DialogTrigger,
 	DialogContent,
-	DialogDescription,
-	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
+	DialogDescription,
+	DialogClose,
 } from '@/components/ui/dialog'
+
+const isOpen = ref(true)
 </script>
 
 <template>
-	<Dialog>
-		<DialogTrigger> Edit Profile </DialogTrigger>
+	<Dialog v-model:open="isOpen">
+		<DialogTrigger as-child>
+			<button class="px-4 py-2 bg-blue-600 text-white rounded">
+				Open Dialog
+			</button>
+		</DialogTrigger>
+
 		<DialogContent>
 			<DialogHeader>
-				<DialogTitle>Edit profile</DialogTitle>
-				<DialogDescription>
-					Make changes to your profile here. Click save when you're done.
-				</DialogDescription>
+				<DialogTitle>Welcome!</DialogTitle>
+				<DialogDescription> This dialog is open by default. </DialogDescription>
 			</DialogHeader>
-
-			<DialogFooter> Save changes </DialogFooter>
+			<DialogClose as-child>
+				<button class="mt-4 px-3 py-1 bg-gray-200 rounded">Close</button>
+			</DialogClose>
 		</DialogContent>
 	</Dialog>
 </template>

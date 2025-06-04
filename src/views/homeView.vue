@@ -4,6 +4,8 @@ import { ref } from 'vue'
 import type { Database } from '../../database.types'
 import CcalCard from '@/components/ccalCard.vue'
 import CcalForm from '@/components/ccalForm.vue'
+import { Utensils, Zap } from 'lucide-vue-next'
+import CcalDialog from '@/components/ccalDialog.vue'
 
 type Product = Database['public']['Tables']['products']['Row']
 type SelectedProduct = Product & { amount: number }
@@ -54,4 +56,5 @@ const getNewKcal = (newKcal: number) => {
 			</div>
 		</div>
 	</section>
+	<CcalDialog />
 </template>

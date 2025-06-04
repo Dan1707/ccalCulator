@@ -3,7 +3,7 @@ import Button from '@/components/ui/button/Button.vue'
 import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
 import { supabase } from '@/lib/supabaseClient'
-import { Calculator } from 'lucide-vue-next'
+import { Calculator, X } from 'lucide-vue-next'
 import { ref, watch } from 'vue'
 
 import type { Database } from '../../database.types'
@@ -14,6 +14,8 @@ type SelectedProduct = Product & { amount: number }
 const dishName = ref('')
 const dishAmount = ref()
 
+const isEmpty = ref(false)
+
 const dishKcal = ref(0)
 const currentItem = ref<SelectedProduct | Product | null>()
 
@@ -21,8 +23,8 @@ const searchResults = ref<Product[]>([])
 const showResults = ref(false)
 
 const emit = defineEmits<{
-	sendProducts: SelectedProduct[]
-	sendKcal: number
+	sendProducts: [products: SelectedProduct[]]
+	sendKcal: [kcal: number]
 }>()
 
 const getCalories = async () => {
@@ -55,33 +57,43 @@ const getCurrentProduct = async (product: SelectedProduct) => {
 	showResults.value = false
 
 	try {
-		let { data, error } = await supabase
-			.from('products')
-			.select()
-			.eq('id', product.id)
+		if (
+			dishName.value !== '' &&
+			dishName.value.length !== 0 &&
+			dishAmount.value !== null &&
+			dishAmount.value !== 0
+		) {
+			isEmpty.value = false
 
-		if (product.kcal && product.amount_g) {
-			dishKcal.value += parseFloat(
-				((product.kcal * dishAmount.value) / 100).toFixed(2)
-			)
+			let { data, error } = await supabase
+				.from('products')
+				.select()
+				.eq('id', product.id)
 
-			emit('sendKcal', dishKcal.value)
-		}
+			if (product.kcal && product.amount_g) {
+				dishKcal.value += parseFloat(
+					((product.kcal * dishAmount.value) / 100).toFixed(2)
+				)
 
-		if (data && data.length > 0) {
-			products.value.push({
-				...data[0],
-				amount: dishAmount.value,
-			})
+				emit('sendKcal', dishKcal.value)
+			}
 
-			emit('sendProducts', products.value)
-		}
+			if (data && data.length > 0) {
+				products.value.push({
+					...data[0],
+					amount: dishAmount.value,
+				})
 
-		dishName.value = ''
-		dishAmount.value = null
+				emit('sendProducts', products.value)
+			}
 
-		if (error) {
-			throw error
+			dishName.value = ''
+			dishAmount.value = null
+			if (error) {
+				throw error
+			}
+		} else {
+			isEmpty.value = true
 		}
 	} catch (error) {
 		console.log(error + 'error with getting current product')
@@ -122,7 +134,7 @@ watch(dishName, () => {
 							placeholder="150"
 							type="number"
 							class="w-full"
-							v-model="dishAmount"
+							v-model.number="dishAmount"
 							required
 						/>
 					</Label>
@@ -135,6 +147,19 @@ watch(dishName, () => {
 					</Button>
 				</div>
 			</form>
+
+			<div
+				class="bg-primary/60 border-3 border-primary rounded-xl p-5 mt-4 text-center font-medium relative"
+				v-if="isEmpty"
+			>
+				Fill the fields, please 🙂
+				<button
+					class="cursor-pointer absolute top-0 right-0 m-3"
+					@click="isEmpty = false"
+				>
+					<X :size="18" />
+				</button>
+			</div>
 			<div
 				class="mt-4 bg-card rounded-xl p-7 shadow-lg max-h-40 overflow-auto flex flex-col gap-3 absolute w-full"
 				v-if="showResults && searchResults.length > 0"
