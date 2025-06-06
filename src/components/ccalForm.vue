@@ -149,7 +149,6 @@ watch(dishName, () => {
 			</form>
 
 			<div
-				class="bg-primary/60 border-3 border-primary rounded-xl p-5 mt-4 text-center font-medium relative"
 				v-if="isEmpty"
 			>
 				Fill the fields, please 🙂
