@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
-export const useCounterStore = defineStore('counter', () => {
-	return {}
+export const useCaloriesStore = defineStore('calories', () => {
+	const intake = ref(0)
+	return { intake }
 })

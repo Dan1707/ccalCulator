@@ -10,6 +10,10 @@ import CcalDialog from '@/components/ccalDialog.vue'
 type Product = Database['public']['Tables']['products']['Row']
 type SelectedProduct = Product & { amount: number }
 
+import { useCaloriesStore } from '@/stores/store'
+
+const store = useCaloriesStore()
+
 const dishKcal = ref(0)
 
 const products = ref<SelectedProduct[]>([])
@@ -40,7 +44,7 @@ const getNewKcal = (newKcal: number) => {
 		>
 			<Zap color="var(--primary)" />
 			Calories intake:
-			<span class="text-white text-xl font-bold ml-2">{{ dishKcal }}</span>
+			<span class="text-white text-xl font-bold ml-2">{{ store.intake }}</span>
 		</h3>
 	</section>
 	<section v-if="products.length !== 0">

@@ -1,5 +1,8 @@
 <script lang="ts" setup>
 import type { Database } from 'database.types'
+import { supabase } from '@/lib/supabaseClient'
+import { ref } from 'vue'
+import CcalProductDialog from './ccalProductDialog.vue'
 
 type Product = Database['public']['Tables']['products']['Row']
 type SelectedProduct = Product & { amount: number }
@@ -7,10 +10,30 @@ type SelectedProduct = Product & { amount: number }
 defineProps<{
 	product: SelectedProduct
 }>()
+
+const productDetails = ref<SelectedProduct>()
+const openDialog = ref(false)
+
+const getProductDetails = async (id: number) => {
+	const { data, error } = await supabase
+		.from('products')
+		.select()
+		.eq('id', `${id}`)
+
+	productDetails.value = data?.[0] as SelectedProduct
+	openDialog.value = true
+
+	if (error) {
+		console.log(error)
+	}
+}
 </script>
 
 <template>
-	<div class="bg-card rounded-xl overflow-hidden shadow-xl mb-5 max-w-md">
+	<div
+		class="bg-card rounded-xl overflow-hidden shadow-xl mb-5 max-w-md cursor-pointer"
+		@click="getProductDetails(product.id)"
+	>
 		<img
 			:src="product.image_url || ''"
 			alt="Product Image"
@@ -30,4 +53,9 @@ defineProps<{
 			<p class="text-gray-300 mb-2 font-medium">{{ product.amount }}g</p>
 		</div>
 	</div>
+
+	<CcalProductDialog
+		v-model:open="openDialog"
+		:details="productDetails as SelectedProduct"
+	/>
 </template>
