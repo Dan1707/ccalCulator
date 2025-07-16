@@ -7,13 +7,23 @@ import {
 	DialogHeader,
 } from '@/components/ui/dialog'
 import Progress from './ui/progress/progress.vue'
+import { computed } from 'vue'
 
 type Product = Database['public']['Tables']['products']['Row']
 type SelectedProduct = Product & { amount: number }
 
-defineProps<{
+const props = defineProps<{
 	details: SelectedProduct
+	weight: number
 }>()
+
+const calcProgress = computed(() => {
+	return {
+		proteins_g: (props.details.proteins_g ?? 0 / props.weight) * 100,
+		fats_g: (props.details.fats_g ?? 0 / props.weight) * 100,
+		carbohydrates_g: (props.details.carbohydrates_g ?? 0 / props.weight) * 100,
+	}
+})
 </script>
 
 <template>
@@ -36,9 +46,18 @@ defineProps<{
 						</h3>
 					</div>
 					<div class="flex items-center justify-center mt-5 gap-2">
-						<Progress :progress="details.proteins_g" />
-						<Progress :progress="details.fats_g" />
-						<Progress :progress="details.carbohydrates_g" />
+						<div class="flex items-center gap-2 flex-col">
+							<Progress :progress="details.proteins_g" />
+							<p>Proteins</p>
+						</div>
+						<div class="flex items-center gap-2 flex-col">
+							<Progress :progress="details.fats_g" />
+							<p>Fats</p>
+						</div>
+						<div class="flex items-center gap-2 flex-col">
+							<Progress :progress="details.carbohydrates_g" />
+							<p>Carbohydrates</p>
+						</div>
 					</div>
 				</DialogDescription>
 			</DialogHeader>

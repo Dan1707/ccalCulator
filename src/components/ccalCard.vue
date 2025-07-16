@@ -57,5 +57,6 @@ const getProductDetails = async (id: number) => {
 	<CcalProductDialog
 		v-model:open="openDialog"
 		:details="productDetails as SelectedProduct"
+		:weight="product.amount"
 	/>
 </template>

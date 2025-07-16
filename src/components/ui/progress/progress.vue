@@ -17,7 +17,7 @@ defineProps<{
 				cy="50%"
 			/>
 			<circle
-				class="text-blue-500 progress-ring"
+				class="text-primary progress-ring"
 				stroke-width="8"
 				stroke="currentColor"
 				fill="transparent"
