@@ -149,11 +149,12 @@ watch(dishName, () => {
 			</form>
 
 			<div
+				class="bg-primary relative text-white text-center p-3 rounded-xl mt-3 w-full"
 				v-if="isEmpty"
 			>
 				Fill the fields, please 🙂
 				<button
-					class="cursor-pointer absolute top-0 right-0 m-3"
+					class="cursor-pointer absolute right-0 mr-3 top-1/2 -translate-y-1/2"
 					@click="isEmpty = false"
 				>
 					<X :size="18" />

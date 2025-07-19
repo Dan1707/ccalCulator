@@ -3,12 +3,14 @@ import type { Database } from 'database.types'
 import { supabase } from '@/lib/supabaseClient'
 import { ref } from 'vue'
 import CcalProductDialog from './ccalProductDialog.vue'
+import { CircleX } from 'lucide-vue-next'
 
 type Product = Database['public']['Tables']['products']['Row']
 type SelectedProduct = Product & { amount: number }
 
-defineProps<{
+const props = defineProps<{
 	product: SelectedProduct
+	productId: number
 }>()
 
 const productDetails = ref<SelectedProduct>()
@@ -27,13 +29,27 @@ const getProductDetails = async (id: number) => {
 		console.log(error)
 	}
 }
+
+const emits = defineEmits<{
+	(event: 'deleteProduct', id: number): void
+}>()
+
+const deleteProduct = () => {
+	emits('deleteProduct', props.productId)
+}
 </script>
 
 <template>
 	<div
-		class="bg-card rounded-xl overflow-hidden shadow-xl mb-5 max-w-md cursor-pointer"
+		class="bg-card rounded-xl overflow-hidden shadow-xl mb-5 max-w-md cursor-pointer relative delete-button"
 		@click="getProductDetails(product.id)"
 	>
+		<button
+			class="absolute p-2 bg-red-500 rounded-lg flex items-center justify-center top-2 right-2 opacity-0 hover:opacity-100 transition-opacity duration-300 cursor-pointer"
+			@click.stop="deleteProduct"
+		>
+			<CircleX />
+		</button>
 		<img
 			:src="product.image_url || ''"
 			alt="Product Image"
@@ -60,3 +76,9 @@ const getProductDetails = async (id: number) => {
 		:weight="product.amount"
 	/>
 </template>
+
+<style>
+.delete-button:hover button {
+	opacity: 100;
+}
+</style>
